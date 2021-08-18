@@ -1,0 +1,83 @@
+The database : https://www.tutorialrepublic.com/codelab.php?topic=sql&file=select-all
+======================================================================================
+
+
+query 1
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Find all customers, who had bought more than two products in their orders from 
+2015-12-31 to 2016-12-31.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT customers.cust_id AS 'Customer-ID', customers.cust_name AS 'Customer-Name', 
+count(*) AS 'orders-count'
+
+FROM customers
+INNER JOIN orders ON customers.cust_id=orders.cust_id
+INNER JOIN order_details ON orders.order_id=order_details.order_id
+
+WHERE orders.order_date BETWEEN "2015-12-31" AND "2016-12-31"
+	
+GROUP BY order_details.order_id
+HAVING COUNT(order_details.order_id) > 2
+
+
+
+query 2
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Find the department which has the highest number of employees.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT departments.dept_name, count(*)
+
+FROM departments
+INNER JOIN employees ON departments.dept_id=employees.dept_id
+
+GROUP BY employees.dept_id
+ORDER BY count(*) DESC
+
+
+
+query 3
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Find the employees that earn more than the average salary of the company.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT employees.emp_id, employees.emp_name, employees.salary
+
+FROM employees
+
+WHERE employees.salary > (SELECT AVG(employees.salary) FROM employees)
+
+
+
+query 4
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+find the customer who has the most order value, after 2015-05-15.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT orders.cust_id, SUM(orders.order_value)
+						   
+FROM orders
+
+WHERE orders.order_date > '2015-05-15'
+
+GROUP BY orders.cust_id
+
+ORDER BY SUM(orders.order_value) DESC
+
+
+
+query 5
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Calculate the increment of 30 USD per each service year to 2018-12-31 for each
+employee and the new salary.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        
+        
+SELECT 
+	emp_id, emp_name, hire_date, salary, ('2018-12-31'-hire_date) AS 'number of years',
+	
+	( salary + (('2018-12-31'-hire_date)*30) ) AS 'New Salary'
+
+FROM employees
+
+ORDER BY hire_date
